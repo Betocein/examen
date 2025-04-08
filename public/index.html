@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokeAPI con Node.js</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #ffcb05;
+            color: #2a75bb;
+            padding: 20px;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Input and button styles */
+        .search-container {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #2a75bb;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2a75bb;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1c4f91;
+        }
+
+        /* Pokemon info styles */
+        .pokemon-info {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .pokemon-info h2 {
+            text-transform: capitalize;
+            color: #2a75bb;
+        }
+
+        .pokemon-info img {
+            display: block;
+            margin: 10px auto;
+        }
+
+        .pokemon-info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Buscar Pokémon</h1>
+    <div class="search-container">
+        <input type="text" id="pokemon-name" placeholder="Escribe el nombre de un Pokémon">
+        <button onclick="searchPokemon()">Buscar</button>
+    </div>
+
+    <div class="pokemon-info" id="pokemon-info"></div>
+
+    <script>
+        function searchPokemon() {
+            const name = document.getElementById('pokemon-name').value.toLowerCase();
+            const pokemonInfoDiv = document.getElementById('pokemon-info');
+
+            if (name) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            pokemonInfoDiv.innerHTML = '<p style="color: red;">Pokémon no encontrado</p>';
+                            throw new Error('Pokémon no encontrado');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const html = `
+                            <h2>${data.name}</h2>
+                            <img src="${data.sprites.front_default}" alt="${data.name}">
+                            <p><strong>Altura:</strong> ${data.height / 10} m</p>
+                            <p><strong>Peso:</strong> ${data.weight / 10} kg</p>
+                            <p><strong>Habilidades:</strong> ${data.abilities.map(a => a.ability.name).join(', ')}</p>
+                        `;
+                        pokemonInfoDiv.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            } else {
+                pokemonInfoDiv.innerHTML = '<p style="color: red;">Por favor, ingresa un nombre de Pokémon.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
